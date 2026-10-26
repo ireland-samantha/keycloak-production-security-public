@@ -1,0 +1,6 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ireland-samantha/keycloak-production-security-public/security/advisories/new
+    about: Report vulnerabilities privately; do not open a public issue.

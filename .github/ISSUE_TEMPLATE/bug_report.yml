@@ -1,0 +1,35 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+name: Bug report
+description: Report a reproducible product defect that is not security-sensitive
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not disclose vulnerabilities or customer-sensitive data here. Use private vulnerability reporting.
+  - type: input
+    id: version
+    attributes:
+      label: Product version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+      description: Include a minimal sanitized reproduction and exact error.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Nonsecret environment details
+      description: Keycloak versions, database family, topology class, and tool versions only.
+    validations:
+      required: true

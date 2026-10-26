@@ -1,0 +1,22 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+keycloak-security-assessment.json
+
+# Local evidence and credentials must never be added to the public package.
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*assessment*.json
+*trivy*.json
+*sbom*.json
+*inventory*.json
+review.json
+*-review.json
+.keycloak-security-evidence/

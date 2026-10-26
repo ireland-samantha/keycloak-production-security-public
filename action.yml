@@ -1,0 +1,80 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+name: Keycloak production security evidence gate
+description: Check selected fields and hashes of trusted local Keycloak assessment evidence; no deployment authorization
+inputs:
+  inventory:
+    description: Path to the nonsecret input-v1 inventory
+    required: true
+  current-trivy:
+    description: Path to the Trivy JSON report for the deployed image
+    required: true
+  candidate-trivy:
+    description: Path to the Trivy JSON report for the exact candidate image
+    required: true
+  current-sbom:
+    description: Path to the CycloneDX SBOM for the deployed image
+    required: true
+  candidate-sbom:
+    description: Path to the CycloneDX SBOM for the exact candidate image
+    required: true
+  scan-binding:
+    description: Path to the manifest binding scanner and SBOM hashes to both exact images
+    required: true
+  codex-review:
+    description: Path to the schema-constrained Codex bidirectional risk review
+    required: true
+  source-name-status:
+    description: Path to the exact current-to-candidate git name/status diff
+    required: true
+  source-binding:
+    description: Path to the manifest binding source diff hashes to both exact commits
+    required: true
+  source-stat:
+    description: Path to the exact current-to-candidate git diff stat
+    required: true
+  output:
+    description: Path for the validated assessment
+    required: false
+    default: keycloak-security-assessment.json
+outputs:
+  state:
+    description: Advisory assessment state; process success does not mean approval
+    value: ${{ steps.gate.outputs.state }}
+  change-class:
+    description: current, patch, minor, major, or downgrade
+    value: ${{ steps.gate.outputs['change_class'] }}
+  assessment-sha256:
+    description: SHA-256 of the assessment
+    value: ${{ steps.gate.outputs.assessment_sha256 }}
+runs:
+  using: composite
+  steps:
+    - id: gate
+      shell: bash
+      env:
+        IAM_KC_INVENTORY: ${{ inputs.inventory }}
+        IAM_KC_CURRENT_TRIVY: ${{ inputs['current-trivy'] }}
+        IAM_KC_CANDIDATE_TRIVY: ${{ inputs['candidate-trivy'] }}
+        IAM_KC_CURRENT_SBOM: ${{ inputs['current-sbom'] }}
+        IAM_KC_CANDIDATE_SBOM: ${{ inputs['candidate-sbom'] }}
+        IAM_KC_SCAN_BINDING: ${{ inputs['scan-binding'] }}
+        IAM_KC_CODEX_REVIEW: ${{ inputs['codex-review'] }}
+        IAM_KC_SOURCE_BINDING: ${{ inputs['source-binding'] }}
+        IAM_KC_SOURCE_NAMES: ${{ inputs['source-name-status'] }}
+        IAM_KC_SOURCE_STAT: ${{ inputs['source-stat'] }}
+        IAM_KC_ASSESSMENT: ${{ inputs.output }}
+      run: |
+        set -euo pipefail
+        python3 "$GITHUB_ACTION_PATH/scripts/keycloak_guard.py" assess \
+          --input "$IAM_KC_INVENTORY" \
+          --trivy "$IAM_KC_CURRENT_TRIVY" \
+          --candidate-trivy "$IAM_KC_CANDIDATE_TRIVY" \
+          --current-sbom "$IAM_KC_CURRENT_SBOM" \
+          --candidate-sbom "$IAM_KC_CANDIDATE_SBOM" \
+          --scan-binding "$IAM_KC_SCAN_BINDING" \
+          --review "$IAM_KC_CODEX_REVIEW" \
+          --source-binding "$IAM_KC_SOURCE_BINDING" \
+          --source-name-status "$IAM_KC_SOURCE_NAMES" \
+          --source-stat "$IAM_KC_SOURCE_STAT" \
+          --output "$IAM_KC_ASSESSMENT" \
+          --github-output "$GITHUB_OUTPUT"

@@ -1,0 +1,6 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+* text=auto eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.yml text eol=lf

@@ -1,0 +1,55 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+name: Verify package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Run deterministic guard tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 scripts/test_keycloak_guard.py
+
+      - name: Run public-release regression tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 scripts/test_public_release.py
+
+      - name: Check exact public package
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 scripts/release_check.py
+
+      - name: Validate JSON and package integrity
+        run: |
+          set -euo pipefail
+          python3 -m json.tool assets/input-schema.json > /dev/null
+          python3 -m json.tool assets/review-schema.json > /dev/null
+          python3 -m json.tool RELEASE.json > /dev/null
+          test ! -e LICENSE
+          sha256sum --status --strict --check PACKAGE-MANIFEST.sha256
+          expected="$(git ls-files | grep -v '^PACKAGE-MANIFEST\.sha256$' | sort)"
+          actual="$(sed -E 's/^[0-9a-f]{64}  //' PACKAGE-MANIFEST.sha256 | sort)"
+          test "$expected" = "$actual"
+          git diff --check
+
+      - name: Enforce source size limit
+        run: |
+          set -euo pipefail
+          oversized="$(git ls-files -z | xargs -0 wc -l | awk '$2 != "total" && $1 > 500 {print}')"
+          test -z "$oversized"

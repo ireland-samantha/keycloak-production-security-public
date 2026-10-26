@@ -1,0 +1,27 @@
+# Synthetic origin: OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.
+name: Feature request
+description: Propose a customer-independent safety or coverage improvement
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: IAM problem
+      description: Describe the production Keycloak risk without customer identifiers.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and affected boundary
+      description: Identify source, migration, protocol, extension, recovery, or rollout behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired portable outcome
+      description: Explain how another IAM team could use the result.
+    validations:
+      required: true

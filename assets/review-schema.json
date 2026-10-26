@@ -1,0 +1,67 @@
+{
+  "synthetic_origin": "OpenAI, GPT-6.1, via Codex. A human did not make this change directly, a system did.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ireland-samantha:keycloak-production-security:review-v1",
+  "title": "Codex Keycloak bidirectional risk review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "current_version", "current_source_commit", "current_image_digest",
+               "current_platform_digest", "candidate_version", "candidate_source_commit",
+               "candidate_image_digest", "candidate_platform_digest", "decision", "overall_risk", "summary", "risk_of_staying",
+               "risk_of_upgrading", "breaking_changes", "blockers", "coverage", "unknowns",
+               "migration_steps", "rollback_steps", "canary_checks"],
+  "properties": {
+    "schema": {"const": "iam.keycloak.production-security/review-v1"},
+    "current_version": {"type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"},
+    "current_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "current_platform_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_version": {"type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"},
+    "candidate_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "candidate_image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_platform_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision": {"enum": ["approve_rehearsal", "manual_migration", "hold"]},
+    "overall_risk": {"enum": ["low", "medium", "high", "critical"]},
+    "summary": {"type": "string", "minLength": 1},
+    "risk_of_staying": {"$ref": "#/$defs/risks"},
+    "risk_of_upgrading": {"$ref": "#/$defs/risks"},
+    "breaking_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["area", "evidence", "impact", "compatibility_test"],
+        "properties": {
+          "area": {"type": "string", "minLength": 1},
+          "evidence": {"type": "string", "minLength": 1},
+          "impact": {"type": "string", "minLength": 1},
+          "compatibility_test": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "blockers": {"$ref": "#/$defs/strings"},
+    "coverage": {"$ref": "#/$defs/nonempty-strings"},
+    "unknowns": {"$ref": "#/$defs/strings"},
+    "migration_steps": {"$ref": "#/$defs/nonempty-strings"},
+    "rollback_steps": {"$ref": "#/$defs/nonempty-strings"},
+    "canary_checks": {"$ref": "#/$defs/nonempty-strings"}
+  },
+  "$defs": {
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "evidence", "impact", "recommendation", "confidence"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["info", "low", "medium", "high", "critical"]},
+        "evidence": {"type": "string", "minLength": 1},
+        "impact": {"type": "string", "minLength": 1},
+        "recommendation": {"type": "string", "minLength": 1},
+        "confidence": {"enum": ["low", "medium", "high"]}
+      }
+    },
+    "risks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/risk"}},
+    "strings": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "nonempty-strings": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}
